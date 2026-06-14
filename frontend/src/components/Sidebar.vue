@@ -15,15 +15,15 @@ const store = useChatStore()
     <div class="sidebar-list">
       <div
         v-for="conv in store.conversations"
-        :key="conv._id || conv.id"
+        :key="conv.id"
         class="sidebar-item"
-        :class="{ active: (conv._id || conv.id) === store.activeConversationId }"
-        @click="store.selectConversation(conv._id || conv.id)"
+        :class="{ active: conv.id === store.activeConversationId }"
+        @click="store.selectConversation(conv.id)"
       >
         <span class="item-title">{{ conv.title }}</span>
         <el-button
           text type="danger" size="small"
-          @click.stop="store.removeConversation(conv._id || conv.id)"
+          @click.stop="store.removeConversation(conv.id)"
         >
           删除
         </el-button>

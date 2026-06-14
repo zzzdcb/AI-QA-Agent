@@ -32,7 +32,7 @@ watch(
   <div ref="scrollRef" class="messages-area">
     <ChatMessage
       v-for="msg in store.messages"
-      :key="msg._id"
+      :key="msg.id"
       :role="msg.role"
       :content="msg.content"
       :is-streaming="store.isStreaming && msg.role === 'assistant' && msg === store.messages[store.messages.length - 1]"

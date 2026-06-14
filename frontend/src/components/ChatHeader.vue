@@ -5,7 +5,7 @@ import { useChatStore } from '@/stores/chat'
 const store = useChatStore()
 
 const title = computed(() => {
-  const conv = store.conversations.find((c: any) => (c._id || c.id) === store.activeConversationId)
+  const conv = store.conversations.find((c: any) => c.id === store.activeConversationId)
   return conv?.title || '对话'
 })
 

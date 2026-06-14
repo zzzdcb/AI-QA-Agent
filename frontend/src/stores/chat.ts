@@ -4,7 +4,7 @@ import { listConversations, createConversation, deleteConversation, getConversat
 import { streamChat } from '@/api/chat'
 
 interface Message {
-  _id: string
+  id: string
   role: 'user' | 'assistant' | 'system'
   content: string
   created_at: string
@@ -12,7 +12,6 @@ interface Message {
 
 interface Conversation {
   id: string
-  _id: string
   title: string
   created_at: string
   updated_at: string
@@ -39,11 +38,10 @@ export const useChatStore = defineStore('chat', () => {
     try {
       const res: any = await createConversation()
       const conv = res.data
-      conv.id = conv._id
       conversations.value.unshift(conv)
-      activeConversationId.value = conv._id
+      activeConversationId.value = conv.id
       messages.value = []
-      return conv._id
+      return conv.id
     } catch (e: any) {
       console.error('创建会话失败:', e.message)
       return null
@@ -64,7 +62,7 @@ export const useChatStore = defineStore('chat', () => {
   async function removeConversation(id: string) {
     try {
       await deleteConversation(id)
-      conversations.value = conversations.value.filter((c: any) => (c._id || c.id) !== id)
+      conversations.value = conversations.value.filter((c: Conversation) => c.id !== id)
       if (activeConversationId.value === id) {
         activeConversationId.value = null
         messages.value = []
@@ -86,7 +84,7 @@ export const useChatStore = defineStore('chat', () => {
 
     // 添加用户消息（乐观更新）
     const userMsg: Message = {
-      _id: 'temp-' + Date.now(),
+      id: 'temp-' + Date.now(),
       role: 'user',
       content,
       created_at: new Date().toISOString(),
@@ -95,7 +93,7 @@ export const useChatStore = defineStore('chat', () => {
 
     // 创建占位 assistant 消息
     const assistantMsg: Message = {
-      _id: 'temp-assistant-' + Date.now(),
+      id: 'temp-assistant-' + Date.now(),
       role: 'assistant',
       content: '',
       created_at: new Date().toISOString(),
@@ -143,7 +141,7 @@ export const useChatStore = defineStore('chat', () => {
               // 流完成，更新消息 id
               const last = messages.value[messages.value.length - 1]
               if (last && last.role === 'assistant') {
-                last._id = event.message_id || last._id
+                last.id = event.message_id || last.id
               }
               streamingContent.value = ''
             } else if (event.type === 'error') {

@@ -2,6 +2,8 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from bson import ObjectId
+
 from app.core.response import ApiResponse, ErrorCode
 from app.daos.conversation_dao import ConversationDAO
 from app.services.chat_service import ChatService
@@ -29,6 +31,12 @@ async def chat_stream(req: ChatRequest):
         doc = await ConversationDAO.create()
         conversation_id = str(doc["_id"])
     else:
+        # 校验 conversation_id 格式
+        if not ObjectId.is_valid(conversation_id):
+            return ApiResponse.error(
+                ErrorCode.BAD_REQUEST, "无效的会话ID", "bad_request",
+                f"conversation_id 格式错误: {conversation_id}", 400,
+            )
         # 验证会话存在
         conv = await ConversationDAO.get_by_id(conversation_id)
         if not conv:

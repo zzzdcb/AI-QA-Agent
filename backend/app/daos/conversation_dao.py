@@ -25,6 +25,8 @@ class ConversationDAO:
 
     @staticmethod
     async def get_by_id(conversation_id: str) -> dict | None:
+        if not ObjectId.is_valid(conversation_id):
+            return None
         db = await get_db()
         return await db.conversations.find_one({"_id": ObjectId(conversation_id)})
 
